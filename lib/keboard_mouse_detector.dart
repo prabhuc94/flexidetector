@@ -62,4 +62,10 @@ class KeyboardMouseDetector {
       isKeyboardMouseActive.value = status;
     }
   }
+
+  void dispose() {
+    _streamKeyboard.close();
+    _streamMouse.close();
+    _keyMouseDetection.close();
+  }
 }

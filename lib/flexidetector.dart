@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flexidetector/enumeration.dart';
 import 'package:flexidetector/keboard_mouse_detector.dart';
+import 'package:flutter/foundation.dart';
 
 /// [IBDetector] is detect [IDLE] / [BREAK] / [ACTIVE] based on keyboard / mouse detection
 class IBDetector {
@@ -32,6 +33,9 @@ class IBDetector {
 
   void _startTimer() {
     if (_timer == null || !(_timer?.isActive ?? false)) {
+      if(kDebugMode) {
+        print("IBDetector:[${DateTime.now().toLocal()}] DETECTION STARTED");
+      }
       _timer = Timer(const Duration(minutes: 1), () {
         final now = DateTime.now();
         final difference = now.difference(_lastActivityTime);
