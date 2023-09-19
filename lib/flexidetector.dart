@@ -36,7 +36,7 @@ class IBDetector {
       if(kDebugMode) {
         print("IBDetector:[${DateTime.now().toLocal()}] DETECTION STARTED");
       }
-      _timer = Timer(const Duration(minutes: 1), () {
+      _timer = Timer.periodic(const Duration(minutes: 1), (_) {
         final now = DateTime.now();
         final difference = now.difference(_lastActivityTime);
         if (difference >= _breakDuration &&
@@ -65,6 +65,9 @@ class IBDetector {
   void _streamUpdate(ActivityStatus status) {
     if (_statusStreamController.isPaused) {
       _statusStreamController.onResume;
+    }
+    if (kDebugMode) {
+      print("IBDETECTOR:[${DateTime.now().toLocal()}] STATUS[${status.name}]");
     }
     _statusStreamController.add(status);
   }
