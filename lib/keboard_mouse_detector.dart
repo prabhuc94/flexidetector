@@ -21,7 +21,7 @@ class KeyboardMouseDetector {
   Stream<RawKeyEvent> get keyBoardDetection => _streamKeyboard.stream;
   Stream<dynamic> get listenKeyMouseEvent => _keyMouseDetection.stream;
 
-  void initialize() {
+  Future<KeyboardMouseDetector> initialize() async {
     if (getListenerBackend()?.initialize() == false) {
       throw Exception("Failed to initialize listener backend");
     }
@@ -35,6 +35,7 @@ class KeyboardMouseDetector {
         print("Keyboard / Mouse Detection successfully!");
       }
     }
+    return this;
   }
 
   void _setKeyboardDetection(RawKeyEvent event) {

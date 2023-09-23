@@ -33,11 +33,12 @@ class AlertDetector {
 
   Timer? _timer;
 
-  void initialize() {
+  Future<AlertDetector> initialize() async {
     keyboardMouseDetector.initialize();
     keyboardMouseDetector.listenKeyMouseEvent.listen((_) => _updateActivityTime());
     _lastActivityTime = DateTime.now();
     _startTimer();
+    return this;
   }
 
   void _startTimer() {
