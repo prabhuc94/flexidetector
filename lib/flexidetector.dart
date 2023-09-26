@@ -24,12 +24,6 @@ class IBDetector {
   ActivityStatus _currentStatus = ActivityStatus.ACTIVE;
   late DateTime _lastActivityTime;
 
-  Future<IBDetector> init() async {
-    keyboardDetection.initialize();
-    keyboardDetection.listenKeyMouseEvent.listen((_) => _updateActivityTime());
-    return this;
-  }
-
   void startService() {
     keyboardDetection.initialize();
     keyboardDetection.listenKeyMouseEvent.listen((_) => _updateActivityTime());

@@ -1,3 +1,6 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial release.
+
+## 0.0.4
+- Included network detection stream using [Connectivity_plus] library
