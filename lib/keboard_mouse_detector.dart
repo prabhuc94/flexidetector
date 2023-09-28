@@ -22,19 +22,27 @@ class KeyboardMouseDetector {
   Stream<dynamic> get listenKeyMouseEvent => _keyMouseDetection.stream;
 
   void initialize() {
-    if (getListenerBackend()?.initialize() == false) {
-      throw Exception("Failed to initialize listener backend");
-    }
-    _keyboardId ??= getListenerBackend()?.addKeyboardListener((key) { _updateNotifier(true); _setKeyboardDetection(key); });
-    _mouseId ??= getListenerBackend()?.addMouseListener((mouse) { _updateNotifier(true);  _setMouseDetection(mouse); });
-
-    if (_keyboardId == null || _mouseId == null) {
-      _setError("Keyboard / Mouse detection failed");
-    } else {
-      if (kDebugMode) {
-        print("Keyboard / Mouse Detection successfully!");
+    if (getListenerBackend() != null) {
+      if (getListenerBackend()!.initialize() == false) {
+        throw Exception("Failed to initialize listener backend");
       }
     }
+      _keyboardId ??= getListenerBackend()?.addKeyboardListener((key) {
+        _updateNotifier(true);
+        _setKeyboardDetection(key);
+      });
+      _mouseId ??= getListenerBackend()?.addMouseListener((mouse) {
+        _updateNotifier(true);
+        _setMouseDetection(mouse);
+      });
+
+      if (_keyboardId == null || _mouseId == null) {
+        _setError("Keyboard / Mouse detection failed");
+      } else {
+        if (kDebugMode) {
+          print("Keyboard / Mouse Detection successfully!");
+        }
+      }
   }
 
   void _setKeyboardDetection(RawKeyEvent event) {
@@ -67,5 +75,12 @@ class KeyboardMouseDetector {
     _streamKeyboard.close();
     _streamMouse.close();
     _keyMouseDetection.close();
+    if (_mouseId != null) {
+      getListenerBackend()?.removeMouseListener(_mouseId!);
+    }
+
+    if (_keyboardId != null) {
+      getListenerBackend()?.removeKeyboardListener(_keyboardId!);
+    }
   }
 }
