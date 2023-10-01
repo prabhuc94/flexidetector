@@ -13,3 +13,8 @@
 
 ## 0.0.7
 - Upgraded Hid_listener library
+
+## 0.0.8
+- Downgraded Hid_listener library
+- Added DeviceInfoPlus library
+- Added PackageInfoPlus library

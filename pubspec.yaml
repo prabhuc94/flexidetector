@@ -1,6 +1,6 @@
 name: flexidetector
 description: IDLE / BREAK Detector
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/prabhuc94/flexidetector
 
 environment:
@@ -10,9 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  hid_listener: ^2.0.0
+  hid_listener: ^1.1.3
   http: ^1.1.0
   connectivity_plus: ^4.0.2
+  package_info_plus: ^4.1.0
+  device_info_plus: ^9.0.3
 
 dev_dependencies:
   flutter_test:

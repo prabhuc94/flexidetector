@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class IpDetector {
@@ -8,9 +9,9 @@ class IpDetector {
 
   Future<String?> detect({String? url}) async {
     if (url == null || url.isEmpty) {
-      return await _detectAPI();
+      return await compute(_detectAPI, null);
     }
-    return await _detectByURL(url);
+    return await compute(_detectByURL, url);
   }
 
   Future<String?> _detectByURL(String url) async {
@@ -26,7 +27,7 @@ class IpDetector {
     }
   }
 
-  Future<String?> _detectAPI() async {
+  Future<String?> _detectAPI(_) async {
     var url = Uri.https("worldtimeapi.org", "/api/ip");
     try {
       var response = await http.get(url);
