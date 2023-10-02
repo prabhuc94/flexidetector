@@ -18,3 +18,6 @@
 - Downgraded Hid_listener library
 - Added DeviceInfoPlus library
 - Added PackageInfoPlus library
+
+## 0.0.9
+- Local IP fetching implemented

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -6,6 +7,11 @@ class IpDetector {
   static final IpDetector instance = IpDetector._internal();
   factory IpDetector()=> instance;
   IpDetector._internal();
+
+  Future<String> localIp({InternetAddressType type = InternetAddressType.IPv4}) async {
+    var addresses = await InternetAddress.lookup(Platform.localHostname);
+    return "${addresses.where((element) => element.type == type).map((e) => e.address).firstOrNull}";
+  }
 
   Future<String?> detect({String? url}) async {
     if (url == null || url.isEmpty) {
