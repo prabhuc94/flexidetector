@@ -21,3 +21,6 @@
 
 ## 0.0.9
 - Local IP fetching implemented
+
+## 0.0.10
+- Alarm Manager created
