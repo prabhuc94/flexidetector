@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class NetworkDetector {
-
-  static final NetworkDetector _instance = NetworkDetector._internal();
-  factory NetworkDetector() => _instance;
-  NetworkDetector._internal();
+  NetworkDetector._() {
+    initialize();
+  }
+  static final NetworkDetector instance = NetworkDetector._();
 
   final _connectivity = Connectivity();
 
@@ -54,3 +54,5 @@ class NetworkStatus {
     "error" : error
   };
 }
+
+final networkDetector = NetworkDetector.instance;

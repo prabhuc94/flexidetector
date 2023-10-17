@@ -24,3 +24,7 @@
 
 ## 0.0.10
 - Alarm Manager created
+
+## 0.0.11
+- New IDLE / BREAK Logic implemented
+- Single instance modified

@@ -10,8 +10,6 @@ class AlertDetector {
   factory AlertDetector() => instance;
   AlertDetector._internal();
 
-  final keyboardMouseDetector = KeyboardMouseDetector();
-
   DateTime _lastActivityTime = DateTime.now();
   DateTime _lastWorkTime = DateTime.now();
   DateTime _currentDateTime = DateTime.now();
@@ -34,7 +32,6 @@ class AlertDetector {
   Timer? _timer;
 
   void initialize() {
-    keyboardMouseDetector.initialize();
     keyboardMouseDetector.listenKeyMouseEvent.listen((_) => _updateActivityTime());
     _lastActivityTime = DateTime.now();
     _startTimer();

@@ -4,9 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class IpDetector {
-  static final IpDetector instance = IpDetector._internal();
-  factory IpDetector()=> instance;
-  IpDetector._internal();
+  IpDetector._();
+  static final IpDetector instance = IpDetector._();
 
   Future<String> localIp({InternetAddressType type = InternetAddressType.IPv4}) async {
     var addresses = await InternetAddress.lookup(Platform.localHostname);
@@ -48,3 +47,5 @@ class IpDetector {
     }
   }
 }
+
+final ipDetector = IpDetector.instance;

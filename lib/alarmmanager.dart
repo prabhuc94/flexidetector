@@ -40,3 +40,5 @@ class AlarmManager {
     });
   }
 }
+
+final alarmManager = AlarmManager.instance;

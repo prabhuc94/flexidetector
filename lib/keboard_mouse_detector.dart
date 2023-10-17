@@ -6,9 +6,11 @@ import 'package:hid_listener/hid_listener.dart';
 
 class KeyboardMouseDetector {
 
-  static final KeyboardMouseDetector _instance = KeyboardMouseDetector._internal();
-  factory KeyboardMouseDetector () => _instance;
-  KeyboardMouseDetector._internal();
+  KeyboardMouseDetector._(){
+    _initialize();
+  }
+
+  static final KeyboardMouseDetector instance = KeyboardMouseDetector._();
 
   int? _keyboardId, _mouseId;
 
@@ -21,12 +23,7 @@ class KeyboardMouseDetector {
   Stream<RawKeyEvent> get keyBoardDetection => _streamKeyboard.stream;
   Stream<dynamic> get listenKeyMouseEvent => _keyMouseDetection.stream;
 
-  void initialize() {
-    /*if (getListenerBackend() != null) {
-      if (getListenerBackend()!.initialize() == false) {
-        throw Exception("Failed to initialize listener backend");
-      }
-    }*/
+  void _initialize() {
       _keyboardId ??= registerKeyboardListener((key) {
         _updateNotifier(true);
         _setKeyboardDetection(key);
@@ -84,3 +81,5 @@ class KeyboardMouseDetector {
     }
   }
 }
+
+final keyboardMouseDetector = KeyboardMouseDetector.instance;

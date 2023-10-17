@@ -5,14 +5,13 @@ import 'dart:async';
 import 'package:flexidetector/enumeration.dart';
 import 'package:flexidetector/keboard_mouse_detector.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hid_listener/hid_listener.dart';
 
 /// [IBDetector] is detect [IDLE] / [BREAK] / [ACTIVE] based on keyboard / mouse detection
 class IBDetector {
   static final IBDetector instance = IBDetector._internal();
   factory IBDetector() => instance;
   IBDetector._internal();
-
-  final keyboardDetection = KeyboardMouseDetector();
 
   final StreamController<ActivityStatus> _statusStreamController = StreamController<ActivityStatus>.broadcast(sync: true);
   Stream<ActivityStatus> get statusStream => _statusStreamController.stream;
@@ -23,10 +22,22 @@ class IBDetector {
   Timer? _timer;
   ActivityStatus _currentStatus = ActivityStatus.ACTIVE;
   late DateTime _lastActivityTime;
+  bool restrictMouseMovement = false;
 
   void startService() {
-    keyboardDetection.initialize();
-    keyboardDetection.listenKeyMouseEvent.listen((_) => _updateActivityTime());
+    keyboardMouseDetector.listenKeyMouseEvent.listen((event) {
+      if (restrictMouseMovement) {
+        if (event is MouseMoveEvent) {
+          if (kDebugMode) {
+            print("Mouse move event [$restrictMouseMovement]");
+          }
+        } else {
+          _updateActivityTime();
+        }
+      } else {
+        _updateActivityTime();
+      }
+    });
     _lastActivityTime = DateTime.now();
     _startTimer();
   }
