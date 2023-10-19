@@ -29,6 +29,8 @@ class TimerEvent {
 
   Function(List<TimerEventModel>)? _statusEvent;
 
+  bool _privateToggled = false;
+
   void _startMonitoring() {
     keyboardMouseDetector.listenKeyMouseEvent.listen((event) {
       if ((event is MouseMoveEvent) == false) {
@@ -56,59 +58,64 @@ class TimerEvent {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(minutes: 1), (timer)
     {
-      Duration difference = _activityStartTime.difference(_lastUpdatedActivityTime);
-      // Duration  timerDifference = (_timerStartTime.isAfter(_lastActivityTime)) ? _timerStartTime.difference(_lastActivityTime) : _lastActivityTime.difference(_timerStartTime);
-      Duration  timerDifference = _lastActivityTime.difference(_timerStartTime);
-      _log("START-TIME[(${(_timerStartTime.isAfter(_lastActivityTime))})] [$_timerStartTime] [$_lastActivityTime] [$timerDifference]");
-      _log(
-          "_startTimer-------10------- Difference between last active  >> $timerDifference  $difference     $_idleDuration     $_breakDuration [$_activityStartTime] [$_lastUpdatedActivityTime]");
-      _log("TIMER-DIFFERENCE [${(timerDifference > zeroDuration)}] [${(timerDifference < zeroDuration)}]");
-      if (timerDifference > zeroDuration) {
-        if (difference < _idleDuration) {
-          _log(
-              "_startTimer-------4------- Active until  >>  $_lastActivityTime");
+      if (_privateToggled == false) {
+        Duration difference = _activityStartTime.difference(_lastUpdatedActivityTime);
+        // Duration  timerDifference = (_timerStartTime.isAfter(_lastActivityTime)) ? _timerStartTime.difference(_lastActivityTime) : _lastActivityTime.difference(_timerStartTime);
+        Duration  timerDifference = _lastActivityTime.difference(_timerStartTime);
+        _log("START-TIME[(${(_timerStartTime.isAfter(_lastActivityTime))})] [$_timerStartTime] [$_lastActivityTime] [$timerDifference]");
+        _log(
+            "_startTimer-------10------- Difference between last active  >> $timerDifference  $difference     $_idleDuration     $_breakDuration [$_activityStartTime] [$_lastUpdatedActivityTime]");
+        _log("TIMER-DIFFERENCE [${(timerDifference > zeroDuration)}] [${(timerDifference < zeroDuration)}]");
+        if (timerDifference > zeroDuration) {
+          if (difference < _idleDuration) {
+            _log(
+                "_startTimer-------4------- Active until  >>  $_lastActivityTime");
 
-          //Update last record end time with _lastActivityTime
-          _updateEvent?.call(_lastActivityTime);
-        } else if (difference >= _idleDuration && difference < _breakDuration) {
-          _log(
-              "_startTimer-------5------- Idle between >>  $_lastUpdatedActivityTime $_activityStartTime");
+            //Update last record end time with _lastActivityTime
+            _updateEvent?.call(_lastActivityTime);
+          } else if (difference >= _idleDuration && difference < _breakDuration) {
+            _log(
+                "_startTimer-------5------- Idle between >>  $_lastUpdatedActivityTime $_activityStartTime");
 
-          _log(
-              "_startTimer-------6------- Active at  >> $_activityStartTime    $_lastActivityTime");
+            _log(
+                "_startTimer-------6------- Active at  >> $_activityStartTime    $_lastActivityTime");
 
-          //Insert new idle record start from _lastUpdatedActivityTime to _activityStartTime
+            //Insert new idle record start from _lastUpdatedActivityTime to _activityStartTime
 
-          //Insert new active record start from _activityStartTime to _lastActivityTime
+            //Insert new active record start from _activityStartTime to _lastActivityTime
 
-          _statusEvent?.call([
-            TimerEventModel(status: ActivityStatus.IDLE, startTime: _lastUpdatedActivityTime, endTime: _activityStartTime),
-            TimerEventModel(status: ActivityStatus.ACTIVE, startTime: _activityStartTime, endTime: _lastActivityTime),
-          ]);
+            _statusEvent?.call([
+              TimerEventModel(status: ActivityStatus.IDLE, startTime: _lastUpdatedActivityTime, endTime: _activityStartTime),
+              TimerEventModel(status: ActivityStatus.ACTIVE, startTime: _activityStartTime, endTime: _lastActivityTime),
+            ]);
 
-        } else if (difference >= _breakDuration) {
-          _log(
-              "_startTimer-------7------- Break between >>  $_lastUpdatedActivityTime $_activityStartTime");
+          } else if (difference >= _breakDuration) {
+            _log(
+                "_startTimer-------7------- Break between >>  $_lastUpdatedActivityTime $_activityStartTime");
 
-          _log(
-              "_startTimer-------8------- Active at  >> $_activityStartTime    $_lastActivityTime");
+            _log(
+                "_startTimer-------8------- Active at  >> $_activityStartTime    $_lastActivityTime");
 
-          //Insert new break record start from _lastUpdatedActivityTime to _activityStartTime
+            //Insert new break record start from _lastUpdatedActivityTime to _activityStartTime
 
-          //Insert new active record start from _activityStartTime to _lastActivityTime
+            //Insert new active record start from _activityStartTime to _lastActivityTime
 
-          _statusEvent?.call([
-            TimerEventModel(status: ActivityStatus.BREAK, startTime: _lastUpdatedActivityTime, endTime: _activityStartTime),
-            TimerEventModel(status: ActivityStatus.ACTIVE, startTime: _activityStartTime, endTime: _lastActivityTime),
-          ]);
+            _statusEvent?.call([
+              TimerEventModel(status: ActivityStatus.BREAK, startTime: _lastUpdatedActivityTime, endTime: _activityStartTime),
+              TimerEventModel(status: ActivityStatus.ACTIVE, startTime: _activityStartTime, endTime: _lastActivityTime),
+            ]);
 
+          }
+          _lastUpdatedActivityTime = _lastActivityTime;
+          _activityStartTime = DateTime.now();
+          _log("_startTimer()-------9------- >>  $difference     $_activityStartTime");
         }
-        _lastUpdatedActivityTime = _lastActivityTime;
-        _activityStartTime = DateTime.now();
-        _log("_startTimer()-------9------- >>  $difference     $_activityStartTime");
+        final now = DateTime.now();
+        _timerStartTime = now;
+      } else {
+        // UPDATING EVENT EVERY ONE MINUTE FOR PRIVATE LOG
+        _updateEvent?.call(DateTime.now());
       }
-      final now = DateTime.now();
-      _timerStartTime = now;
     });
   }
 
@@ -118,6 +125,8 @@ class TimerEvent {
     _log("TIMER-STOPPED");
   }
 
+  bool get isTimerPaused => (_timer?.isActive ?? false);
+
   void play() {
     _startTimer();
     _log("TIMER-RESTARTED");
@@ -125,6 +134,11 @@ class TimerEvent {
 
   void dispose() {
     _timer?.cancel();
+  }
+
+  set privateToggle(bool value) {
+    _privateToggled = value;
+    _log("PRIVATE-FLAG-MODIFIED: ${_privateToggled ? "ENABLED" : "DISABLED"}");
   }
 
   set breakDuration(Duration value) {

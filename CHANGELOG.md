@@ -28,3 +28,6 @@
 ## 0.0.11
 - New IDLE / BREAK Logic implemented
 - Single instance modified
+
+## 0.0.12
+- Private toggle implemented
