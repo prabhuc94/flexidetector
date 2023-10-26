@@ -31,3 +31,6 @@
 
 ## 0.0.12
 - Private toggle implemented
+
+## 0.0.13
+- Alter TimerEvent created for [TESTING] purpose
