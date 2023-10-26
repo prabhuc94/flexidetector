@@ -1,6 +1,6 @@
 name: flexidetector
 description: IDLE / BREAK Detector
-version: 0.0.13
+version: 0.0.18
 homepage: https://github.com/prabhuc94/flexidetector
 
 environment:

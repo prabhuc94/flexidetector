@@ -51,13 +51,13 @@ class TimerEventAlter {
           _lastUpdatedActivityTime = current;
           _timerStartTime = current;
         }
-        if (_privateToggled) {
+        if (_privateToggled && _lastActivityStatus == ActivityStatus.ACTIVE) {
           final current = DateTime.now();
           _activityStartTime = current;
           _lastUpdatedActivityTime = current;
           _timerStartTime = current;
         }
-        if( timerDifference >= zeroDuration ) {
+        if( timerDifference > zeroDuration ) {
           _activityStartTime = now;
           _log("_startTimer()-------1------- >>  $timerDifference     $zeroDuration [$_activityStartTime]");
         }
@@ -80,7 +80,7 @@ class TimerEventAlter {
       if (_privateToggled == false) {
         Duration difference = _activityStartTime.difference(_lastUpdatedActivityTime);
         // Duration  timerDifference = (_timerStartTime.isAfter(_lastActivityTime)) ? _timerStartTime.difference(_lastActivityTime) : _lastActivityTime.difference(_timerStartTime);
-        Duration  timerDifference = _lastActivityTime.difference(_timerStartTime);
+        Duration  timerDifference = _timerStartTime.difference(_lastActivityTime);
         _log("START-TIME[(${(_timerStartTime.isAfter(_lastActivityTime))})] [$_timerStartTime] [$_lastActivityTime] [$timerDifference]");
         _log(
             "_startTimer-------10------- Difference between last active  >> $timerDifference  $difference     $_idleDuration     $_breakDuration [$_activityStartTime] [$_lastUpdatedActivityTime]");

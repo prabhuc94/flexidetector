@@ -34,3 +34,18 @@
 
 ## 0.0.13
 - Alter TimerEvent created for [TESTING] purpose
+
+## 0.0.14
+- FIXING Alter TimerEvent created for [TESTING] purpose
+
+## 0.0.15
+- FIXING Alter TimerEvent created for [TESTING] purpose
+
+## 0.0.16
+- FIXING Alter TimerEvent created for [TESTING] purpose
+
+## 0.0.17
+- Periodic Duration can be modified
+
+## 0.0.18
+- Debounce method implemented and included in [Timer Event]

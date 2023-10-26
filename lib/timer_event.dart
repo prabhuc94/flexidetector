@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:flexidetector/debouncer.dart';
 import 'package:flexidetector/keboard_mouse_detector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hid_listener/hid_listener.dart';
@@ -31,6 +32,8 @@ class TimerEvent {
 
   bool _privateToggled = false;
 
+  Duration _periodicDuration = Duration(minutes: 1);
+
   void _startMonitoring() {
     keyboardMouseDetector.listenKeyMouseEvent.listen((event) {
       if ((event is MouseMoveEvent) == false) {
@@ -56,7 +59,7 @@ class TimerEvent {
 
   void _startTimer( ){
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer)
+    _timer = Timer.periodic(_periodicDuration, (timer)
     {
       if (_privateToggled == false) {
         Duration difference = _activityStartTime.difference(_lastUpdatedActivityTime);
@@ -72,7 +75,7 @@ class TimerEvent {
                 "_startTimer-------4------- Active until  >>  $_lastActivityTime");
 
             //Update last record end time with _lastActivityTime
-            _updateEvent?.call(_lastActivityTime);
+            debounce.run(() => _updateEvent?.call(_lastActivityTime), duration: const Duration(minutes: 1));
           } else if (difference >= _idleDuration && difference < _breakDuration) {
             _log(
                 "_startTimer-------5------- Idle between >>  $_lastUpdatedActivityTime $_activityStartTime");
@@ -114,9 +117,15 @@ class TimerEvent {
         _timerStartTime = now;
       } else {
         // UPDATING EVENT EVERY ONE MINUTE FOR PRIVATE LOG
-        _updateEvent?.call(DateTime.now());
+        debounce.run(() => _updateEvent?.call(DateTime.now()), duration: const Duration(minutes: 1));
       }
     });
+  }
+
+
+  set periodicDuration(Duration value) {
+    _periodicDuration = value;
+    play();
   }
 
   void pause() {
