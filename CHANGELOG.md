@@ -49,3 +49,7 @@
 
 ## 0.0.18
 - Debounce method implemented and included in [Timer Event]
+
+## 0.0.19
+- Debounce method modified
+- TimerEvent modified

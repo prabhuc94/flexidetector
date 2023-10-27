@@ -32,20 +32,22 @@ class TimerEvent {
 
   bool _privateToggled = false;
 
-  Duration _periodicDuration = Duration(minutes: 1);
+  Duration _periodicDuration = const Duration(minutes: 1);
+
+  bool _disposed = false;
 
   void _startMonitoring() {
     keyboardMouseDetector.listenKeyMouseEvent.listen((event) {
-      if ((event is MouseMoveEvent) == false) {
+      if ((event is MouseMoveEvent) == false && !_privateToggled) {
         final now = DateTime.now();
         Duration  timerDifference = _timerStartTime.difference(_activityStartTime);
         _lastActivityTime = now;
-        _log("TIMER-DIFF TS:[$_timerStartTime] AS:[$_activityStartTime] DIFF:[$timerDifference]");
+        // _log("TIMER-DIFF TS:[$_timerStartTime] AS:[$_activityStartTime] DIFF:[$timerDifference]");
         if( timerDifference >= zeroDuration ) {
           _activityStartTime = now;
-          _log("_startTimer()-------1------- >>  $timerDifference     $zeroDuration [$_activityStartTime]");
+          // _log("_startTimer()-------1------- >>  $timerDifference     $zeroDuration [$_activityStartTime]");
         }
-        _log("_startTimer()-------2------- >>  $timerDifference     $zeroDuration  $_lastActivityTime   $_timerStartTime    $_activityStartTime");
+        // _log("_startTimer()-------2------- >>  $timerDifference     $zeroDuration  $_lastActivityTime   $_timerStartTime    $_activityStartTime");
       }
     });
     final now = DateTime.now();
@@ -53,35 +55,36 @@ class TimerEvent {
     _timerStartTime = now;
     _activityStartTime = now;
     _lastUpdatedActivityTime= now;
-    _log("_startTimer()-------3------- >>  $_lastActivityTime     $_timerStartTime  $_activityStartTime $_lastUpdatedActivityTime");
+    // _log("_startTimer()-------3------- >>  $_lastActivityTime     $_timerStartTime  $_activityStartTime $_lastUpdatedActivityTime");
     _startTimer();
   }
 
   void _startTimer( ){
     _timer?.cancel();
+    _disposed = false;
     _timer = Timer.periodic(_periodicDuration, (timer)
     {
       if (_privateToggled == false) {
         Duration difference = _activityStartTime.difference(_lastUpdatedActivityTime);
         // Duration  timerDifference = (_timerStartTime.isAfter(_lastActivityTime)) ? _timerStartTime.difference(_lastActivityTime) : _lastActivityTime.difference(_timerStartTime);
         Duration  timerDifference = _lastActivityTime.difference(_timerStartTime);
-        _log("START-TIME[(${(_timerStartTime.isAfter(_lastActivityTime))})] [$_timerStartTime] [$_lastActivityTime] [$timerDifference]");
-        _log(
-            "_startTimer-------10------- Difference between last active  >> $timerDifference  $difference     $_idleDuration     $_breakDuration [$_activityStartTime] [$_lastUpdatedActivityTime]");
-        _log("TIMER-DIFFERENCE [${(timerDifference > zeroDuration)}] [${(timerDifference < zeroDuration)}]");
+        // _log("START-TIME[(${(_timerStartTime.isAfter(_lastActivityTime))})] [$_timerStartTime] [$_lastActivityTime] [$timerDifference]");
+        // _log("_startTimer-------10------- Difference between last active  >> $timerDifference  $difference     $_idleDuration     $_breakDuration [$_activityStartTime] [$_lastUpdatedActivityTime]");
+        // _log("TIMER-DIFFERENCE [${(timerDifference > zeroDuration)}] [${(timerDifference < zeroDuration)}]");
         if (timerDifference > zeroDuration) {
           if (difference < _idleDuration) {
-            _log(
-                "_startTimer-------4------- Active until  >>  $_lastActivityTime");
+            // _log("_startTimer-------4------- Active until  >>  $_lastActivityTime");
 
             //Update last record end time with _lastActivityTime
-            debounce.run(() => _updateEvent?.call(_lastActivityTime), duration: const Duration(minutes: 1));
+            if (periodicDuration.inMinutes != 1) {
+              debounce.run(() => _updateEvent?.call(_lastActivityTime), duration: const Duration(minutes: 1));
+            } else {
+              _updateEvent?.call(_lastActivityTime);
+            }
           } else if (difference >= _idleDuration && difference < _breakDuration) {
-            _log(
-                "_startTimer-------5------- Idle between >>  $_lastUpdatedActivityTime $_activityStartTime");
+            // _log("_startTimer-------5------- Idle between >>  $_lastUpdatedActivityTime $_activityStartTime");
 
-            _log(
-                "_startTimer-------6------- Active at  >> $_activityStartTime    $_lastActivityTime");
+            // _log("_startTimer-------6------- Active at  >> $_activityStartTime    $_lastActivityTime");
 
             //Insert new idle record start from _lastUpdatedActivityTime to _activityStartTime
 
@@ -93,11 +96,9 @@ class TimerEvent {
             ]);
 
           } else if (difference >= _breakDuration) {
-            _log(
-                "_startTimer-------7------- Break between >>  $_lastUpdatedActivityTime $_activityStartTime");
+            // _log("_startTimer-------7------- Break between >>  $_lastUpdatedActivityTime $_activityStartTime");
 
-            _log(
-                "_startTimer-------8------- Active at  >> $_activityStartTime    $_lastActivityTime");
+            // _log("_startTimer-------8------- Active at  >> $_activityStartTime    $_lastActivityTime");
 
             //Insert new break record start from _lastUpdatedActivityTime to _activityStartTime
 
@@ -111,13 +112,17 @@ class TimerEvent {
           }
           _lastUpdatedActivityTime = _lastActivityTime;
           _activityStartTime = DateTime.now();
-          _log("_startTimer()-------9------- >>  $difference     $_activityStartTime");
+          // _log("_startTimer()-------9------- >>  $difference     $_activityStartTime");
         }
         final now = DateTime.now();
         _timerStartTime = now;
       } else {
         // UPDATING EVENT EVERY ONE MINUTE FOR PRIVATE LOG
-        debounce.run(() => _updateEvent?.call(DateTime.now()), duration: const Duration(minutes: 1));
+        if (periodicDuration.inMinutes != 1) {
+          debounce.run(() => _updateEvent?.call(DateTime.now()), duration: const Duration(minutes: 1));
+        } else {
+          _updateEvent?.call(DateTime.now());
+        }
       }
     });
   }
@@ -125,24 +130,30 @@ class TimerEvent {
 
   set periodicDuration(Duration value) {
     _periodicDuration = value;
-    play();
+    _log("TIMER-PERIODIC-DURATION-SET [$_periodicDuration]");
   }
 
   void pause() {
     _timer?.cancel();
-    // _updateEvent?.call(DateTime.now());
     _log("TIMER-STOPPED");
   }
 
   bool get isTimerPaused => (_timer?.isActive ?? false);
 
   void play() {
+    final now = DateTime.now();
+    _lastActivityTime = now;
+    _timerStartTime = now;
+    _activityStartTime = now;
+    _lastUpdatedActivityTime= now;
     _startTimer();
     _log("TIMER-RESTARTED");
   }
 
   void dispose() {
+    _disposed = true;
     _timer?.cancel();
+    _log("TIMER-DISPOSED");
   }
 
   set privateToggle(bool value) {
@@ -154,10 +165,19 @@ class TimerEvent {
     _breakDuration = value;
     _log("NEW-BREAK-TIME:\t${_breakDuration.inMinutes} IS SET");
   }
+
   set idleDuration(Duration value) {
     _idleDuration = value;
     _log("NEW-IDLE-TIME:\t${_idleDuration.inMinutes} IS SET");
   }
+
+  bool get isTicking => (_timer?.isActive ?? false);
+
+  bool get privateToggled => _privateToggled;
+
+  Duration get periodicDuration => _periodicDuration;
+
+  bool get isDisposed => _disposed;
 
   void _log(String message) {
     if (kDebugMode) {
