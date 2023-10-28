@@ -53,3 +53,6 @@
 ## 0.0.19
 - Debounce method modified
 - TimerEvent modified
+
+## 0.0.20
+- Timer Event Flow modified
