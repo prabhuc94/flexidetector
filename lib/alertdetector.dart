@@ -128,7 +128,6 @@ class AlertDetector {
     _disableIDLE = (value.inMinutes <= 0);
   }
 
-
   set isActive(bool value) => _isActive = value;
 
   void _resetWorkCount() {
@@ -162,6 +161,27 @@ class AlertDetector {
         _currentAccount = accountId;
       }
     }
+  }
+
+  void stop() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void restart() {
+    final now = DateTime.now();
+    _lastActivityTime = now;
+    _lastWorkTime = now;
+    _currentDateTime = now;
+
+    _currentCount = 0;
+    _newCurrentCount = 0;
+    _workCount = 0;
+    _newWorkCount = 0;
+
+    _privateCount = 0;
+    _newPrivateCount = 0;
+    _startTimer();
   }
 
   void dispose() {

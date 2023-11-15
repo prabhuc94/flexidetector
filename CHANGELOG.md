@@ -56,3 +56,6 @@
 
 ## 0.0.20
 - Timer Event Flow modified
+
+## 0.0.21
+- AlertDetector stop and restart timer method added 
